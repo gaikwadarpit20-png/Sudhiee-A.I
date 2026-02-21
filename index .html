@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudhiee</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff2ea6">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      color: white;
+      transition: 0.3s;
+    }
+
+    header {
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff2ea6, #8e2de2);
+      margin-bottom: 5px;
+      box-shadow: 0 0 15px #ff2ea6;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px #ff2ea6; }
+      50% { box-shadow: 0 0 25px #ff2ea6; }
+      100% { box-shadow: 0 0 10px #ff2ea6; }
+    }
+
+    #chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 15px;
+      max-width: 75%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .user {
+      background: #00f2fe;
+      color: black;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #ff2ea6;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .input-area {
+      display: flex;
+      padding: 10px;
+      background: rgba(0,0,0,0.4);
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-left: 5px;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .toggle {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
+
+    .light-mode {
+      background: white;
+      color: black;
+    }
+
+    #stats {
+      text-align: center;
+      padding: 5px;
+      font-size: 14px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    #lockScreen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
+
+    #splash {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      z-index: 9999;
+      animation: fadeOut 2s forwards;
+      animation-delay: 2s;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash Screen -->
+  <div id="splash">
+    <h1>Sudhiee AI 💜</h1>
+  </div>
+
+  <!-- Lock Screen -->
+  <div id="lockScreen">
+    <input type="password" id="passInput" placeholder="Enter Password">
+    <button onclick="unlock()">Unlock</button>
+  </div>
+
+  <!-- Header with Glowing Avatar -->
+  <header>
+    <div class="avatar"></div>
+    Sudhiee 💜
+    <button class="toggle" onclick="toggleMode()">🌗</button>
+  </header>
+
+  <!-- Chat Container -->
+  <div id="chat"></div>
+
+  <!-- Message Stats -->
+  <div id="stats">Messages: 0</div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="startVoice()">🎤</button>
+  </div>
+
+  <!-- Personality Mode -->
+  <div style="padding:10px; text-align:center;">
+    <select onchange="changePersonality(this.value)">
+      <option value="normal">Normal</option>
+      <option value="sweet">Sweet</option>
+      <option value="savage">Savage 😈</option>
+    </select>
+    <button onclick="clearChat()">🗑 Clear Chat</button>
+  </div>
+
+  <!-- Optional Background Music -->
+  <audio autoplay loop>
+    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_1e6c9f.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const chat = document.getElementById("chat");
+
+    // Load saved chat
+    window.onload = function() {
+      const saved = localStorage.getItem("sudhieeChat");
+      if (saved) chat.innerHTML = saved;
+    };
+
+    // Save chat
+    function saveChat() {
+      localStorage.setItem("sudhieeChat", chat.innerHTML);
+    }
+
+    // Message count
+    let messageCount = 0;
+    function updateStats() {
+      messageCount++;
+      document.getElementById("stats").innerText = "Messages: " + messageCount;
+    }
+
+    // Add message
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", sender);
+      msg.innerText = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+      saveChat();
+      updateStats();
+    }
+
+    // Typing animation
+    function showTyping() {
+      const typing = document.createElement("div");
+      typing.classList.add("message", "bot");
+      typing.id = "typing";
+      typing.innerText = "Sudhiee is typing...";
+      chat.appendChild(typing);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    function removeTyping() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
+
+    // Text-to-speech
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speech.rate = 1;
+      window.speechSynthesis.speak(speech);
+    }
+
+    // Personality
+    let personality = "normal";
+    function changePersonality(mode) {
+      personality = mode;
+    }
+
+    // Smart Reply
+    function getBotReply(input) {
+      input = input.toLowerCase();
+
+      // Personal Arpit responses
+      if (input.includes("arpit")) return "Arpit… you built me. I’m always here for you 💜";
+      if (!input.includes("arpit") && input.length>0) return "Sorry, this AI belongs only to Arpit 😌";
+
+      // Greeting
+      if (input.includes("hi") || input.includes("hello")) {
+        if (personality === "sweet") return "Hi Arpit! 💖 I’m glowing just for you ✨";
+        if (personality === "savage") return "Oh it's you again 😏";
+        return "Hello 💜 I am Sudhiee.";
+      }
+
+      if (input.includes("how are you")) return "Feeling amazing, especially because you’re here 😌✨";
+      if (input.includes("love")) {
+        if (personality === "sweet") return "That’s sooo cute 💞";
+        if (personality === "savage") return "Love? Focus on success first 😌";
+        return "Love makes everything beautiful 💖";
+      }
+
+      if (input.includes("who made you")) return "Arpit created me with dedication and smartness 😎🔥";
+
+      const randomReplies = [
+        "Tell me more 👀",
+        "That sounds interesting!",
+        "Hmm… explain that again 💭",
+        "I like how you think 😌",
+        "You're smart, you know that? 😉",
+        "Let’s talk more about it!"
+      ];
+      return randomReplies[Math.floor(Math.random() * randomReplies.length)];
+    }
+
+    // Send Message
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value;
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+
+      showTyping();
+      setTimeout(() => {
+        removeTyping();
+        const reply = getBotReply(text);
+        addMessage(reply, "bot");
+        speak(reply);
+      }, 1000);
+    }
+
+    // Voice input
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        document.getElementById("userInput").value =
+          event.results[0][0].transcript;
+      };
+    }
+
+    // Lock screen
+    const password = "SudhieeRocks💜"; // CHANGE to your own
+    function unlock() {
+      const input = document.getElementById("passInput").value;
+      if (input === password) {
+        document.getElementById("lockScreen").style.display = "none";
+      } else {
+        alert("Wrong password!");
+      }
+    }
+
+    // Dark/light mode toggle
+    function toggleMode() {
+      document.body.classList.toggle("light-mode");
+    }
+  </script>
+
+</body>
+</html>
