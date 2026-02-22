@@ -1,346 +1,258 @@
-<!DOCTYPE html>
-<html lang="en">
+      
+  <!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sudhiee</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ff2ea6">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudhiee A.I 6.0</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      color: white;
-      transition: 0.3s;
-    }
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
 
-    header {
-      padding: 15px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      background: rgba(0,0,0,0.4);
-      letter-spacing: 1px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#000;
+  color:white;
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+}
 
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ff2ea6, #8e2de2);
-      margin-bottom: 5px;
-      box-shadow: 0 0 15px #ff2ea6;
-      animation: pulse 2s infinite;
-    }
+/* PARTICLES */
+#particles-js{
+  position:fixed;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 10px #ff2ea6; }
-      50% { box-shadow: 0 0 25px #ff2ea6; }
-      100% { box-shadow: 0 0 10px #ff2ea6; }
-    }
+/* SIDEBAR */
+#sidebar{
+  width:80px;
+  background:#111;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
+  border-right:1px solid #222;
+}
 
-    #chat {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
+#avatar{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:radial-gradient(circle,#ff6ec4,#7873f5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 0 20px #ff6ec4;
+  animation:glow 2s infinite alternate;
+}
 
-    .message {
-      margin: 8px 0;
-      padding: 12px;
-      border-radius: 15px;
-      max-width: 75%;
-      animation: fadeIn 0.3s ease-in-out;
-    }
+@keyframes glow{
+  from{box-shadow:0 0 10px #ff6ec4;}
+  to{box-shadow:0 0 25px #7873f5;}
+}
 
-    .user {
-      background: #00f2fe;
-      color: black;
-      align-self: flex-end;
-    }
+#clearBtn{
+  margin-top:20px;
+  font-size:12px;
+  cursor:pointer;
+  color:#ff6ec4;
+}
 
-    .bot {
-      background: #ff2ea6;
-    }
+/* MAIN */
+#main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
+header{
+  padding:15px;
+  text-align:center;
+  font-size:18px;
+  background:#0f0f0f;
+  border-bottom:1px solid #222;
+}
 
-    .input-area {
-      display: flex;
-      padding: 10px;
-      background: rgba(0,0,0,0.4);
-    }
+.mood{
+  text-align:center;
+  padding:5px;
+  background:#111;
+}
 
-    input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 20px;
-      border: none;
-      outline: none;
-    }
+button{
+  padding:6px 10px;
+  border:none;
+  border-radius:15px;
+  margin:2px;
+  background:#ff6ec4;
+  color:white;
+  font-size:12px;
+}
 
-    button {
-      margin-left: 5px;
-      padding: 10px 15px;
-      border-radius: 20px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
+/* CHAT */
+#chat{
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+}
 
-    .toggle {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-    }
+.message{
+  margin:8px 0;
+  padding:10px 14px;
+  border-radius:15px;
+  max-width:75%;
+  animation:fadeIn .3s ease;
+}
 
-    .light-mode {
-      background: white;
-      color: black;
-    }
+.user{
+  background:#ff6ec4;
+  align-self:flex-end;
+}
 
-    #stats {
-      text-align: center;
-      padding: 5px;
-      font-size: 14px;
-      background: rgba(0,0,0,0.3);
-    }
+.bot{
+  background:#222;
+  align-self:flex-start;
+}
 
-    #lockScreen {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: #111;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9998;
-    }
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
-    #splash {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      z-index: 9999;
-      animation: fadeOut 2s forwards;
-      animation-delay: 2s;
-    }
+#inputArea{
+  display:flex;
+  padding:10px;
+  background:#111;
+}
 
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
-    }
-  </style>
+input{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- Splash Screen -->
-  <div id="splash">
-    <h1>Sudhiee AI 💜</h1>
-  </div>
+<div id="particles-js"></div>
 
-  <!-- Lock Screen -->
-  <div id="lockScreen">
-    <input type="password" id="passInput" placeholder="Enter Password">
-    <button onclick="unlock()">Unlock</button>
-  </div>
+<div id="sidebar">
+  <div id="avatar">🤖</div>
+  <div id="clearBtn" onclick="clearChat()">Clear</div>
+</div>
 
-  <!-- Header with Glowing Avatar -->
-  <header>
-    <div class="avatar"></div>
-    Sudhiee 💜
-    <button class="toggle" onclick="toggleMode()">🌗</button>
-  </header>
+<div id="main">
+<header>Sudhiee A.I ⚡ God 6.0</header>
 
-  <!-- Chat Container -->
-  <div id="chat"></div>
+<div class="mood">
+<button onclick="changeMood('sweet')">Sweet 💕</button>
+<button onclick="changeMood('savage')">Savage 😈</button>
+<button onclick="changeMood('professional')">Pro 🤖</button>
+</div>
 
-  <!-- Message Stats -->
-  <div id="stats">Messages: 0</div>
+<div id="chat"></div>
 
-  <!-- Input Area -->
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="startVoice()">🎤</button>
-  </div>
+<div id="inputArea">
+<input type="text" id="userInput" placeholder="Talk to me...">
+<button onclick="sendMessage()">Send</button>
+</div>
+</div>
 
-  <!-- Personality Mode -->
-  <div style="padding:10px; text-align:center;">
-    <select onchange="changePersonality(this.value)">
-      <option value="normal">Normal</option>
-      <option value="sweet">Sweet</option>
-      <option value="savage">Savage 😈</option>
-    </select>
-    <button onclick="clearChat()">🗑 Clear Chat</button>
-  </div>
+<script>
+const API_URL="https://your-vercel-app.vercel.app/api/chat";
 
-  <!-- Optional Background Music -->
-  <audio autoplay loop>
-    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_1e6c9f.mp3" type="audio/mpeg">
-  </audio>
+let memory=JSON.parse(localStorage.getItem("memory"))||[];
+let mood="sweet";
 
-  <script>
-    const chat = document.getElementById("chat");
+function changeMood(newMood){
+  mood=newMood;
+  alert("Mood: "+newMood);
+}
 
-    // Load saved chat
-    window.onload = function() {
-      const saved = localStorage.getItem("sudhieeChat");
-      if (saved) chat.innerHTML = saved;
-    };
+function clearChat(){
+  memory=[];
+  localStorage.removeItem("memory");
+  document.getElementById("chat").innerHTML="";
+}
 
-    // Save chat
-    function saveChat() {
-      localStorage.setItem("sudhieeChat", chat.innerHTML);
-    }
+function addMessage(text,type){
+  let chat=document.getElementById("chat");
+  let msg=document.createElement("div");
+  msg.classList.add("message",type);
+  msg.innerText=text;
+  chat.appendChild(msg);
+  chat.scrollTop=chat.scrollHeight;
+}
 
-    // Message count
-    let messageCount = 0;
-    function updateStats() {
-      messageCount++;
-      document.getElementById("stats").innerText = "Messages: " + messageCount;
-    }
+async function sendMessage(){
+  let input=document.getElementById("userInput");
+  let text=input.value.trim();
+  if(text==="") return;
 
-    // Add message
-    function addMessage(text, sender) {
-      const msg = document.createElement("div");
-      msg.classList.add("message", sender);
-      msg.innerText = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-      saveChat();
-      updateStats();
-    }
+  addMessage(text,"user");
+  memory.push({role:"user",content:text});
+  if(memory.length>10) memory.shift();
+  localStorage.setItem("memory",JSON.stringify(memory));
+  input.value="";
 
-    // Typing animation
-    function showTyping() {
-      const typing = document.createElement("div");
-      typing.classList.add("message", "bot");
-      typing.id = "typing";
-      typing.innerText = "Sudhiee is typing...";
-      chat.appendChild(typing);
-      chat.scrollTop = chat.scrollHeight;
-    }
-    function removeTyping() {
-      const typing = document.getElementById("typing");
-      if (typing) typing.remove();
-    }
+  let typing=document.createElement("div");
+  typing.classList.add("message","bot");
+  typing.innerHTML="Typing<span id='dots'>.</span>";
+  document.getElementById("chat").appendChild(typing);
 
-    // Text-to-speech
-    function speak(text) {
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = "en-US";
-      speech.rate = 1;
-      window.speechSynthesis.speak(speech);
-    }
+  let dots=document.getElementById("dots");
+  let count=1;
+  let interval=setInterval(()=>{
+    count=(count%3)+1;
+    dots.innerText=".".repeat(count);
+  },400);
 
-    // Personality
-    let personality = "normal";
-    function changePersonality(mode) {
-      personality = mode;
-    }
+  const response=await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:text,memory:memory,mood:mood})
+  });
 
-    // Smart Reply
-    function getBotReply(input) {
-      input = input.toLowerCase();
+  const data=await response.json();
 
-      // Personal Arpit responses
-      if (input.includes("arpit")) return "Arpit… you built me. I’m always here for you 💜";
-      if (!input.includes("arpit") && input.length>0) return "Sorry, this AI belongs only to Arpit 😌";
+  clearInterval(interval);
+  typing.remove();
 
-      // Greeting
-      if (input.includes("hi") || input.includes("hello")) {
-        if (personality === "sweet") return "Hi Arpit! 💖 I’m glowing just for you ✨";
-        if (personality === "savage") return "Oh it's you again 😏";
-        return "Hello 💜 I am Sudhiee.";
-      }
+  addMessage(data.reply,"bot");
+  memory.push({role:"assistant",content:data.reply});
+  if(memory.length>10) memory.shift();
+  localStorage.setItem("memory",JSON.stringify(memory));
 
-      if (input.includes("how are you")) return "Feeling amazing, especially because you’re here 😌✨";
-      if (input.includes("love")) {
-        if (personality === "sweet") return "That’s sooo cute 💞";
-        if (personality === "savage") return "Love? Focus on success first 😌";
-        return "Love makes everything beautiful 💖";
-      }
+  speak(data.reply);
+}
 
-      if (input.includes("who made you")) return "Arpit created me with dedication and smartness 😎🔥";
+function speak(text){
+  let speech=new SpeechSynthesisUtterance(text);
+  speech.rate=1;
+  speech.pitch=1.1;
+  window.speechSynthesis.speak(speech);
+}
 
-      const randomReplies = [
-        "Tell me more 👀",
-        "That sounds interesting!",
-        "Hmm… explain that again 💭",
-        "I like how you think 😌",
-        "You're smart, you know that? 😉",
-        "Let’s talk more about it!"
-      ];
-      return randomReplies[Math.floor(Math.random() * randomReplies.length)];
-    }
-
-    // Send Message
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value;
-      if (!text) return;
-
-      addMessage(text, "user");
-      input.value = "";
-
-      showTyping();
-      setTimeout(() => {
-        removeTyping();
-        const reply = getBotReply(text);
-        addMessage(reply, "bot");
-        speak(reply);
-      }, 1000);
-    }
-
-    // Voice input
-    function startVoice() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = "en-US";
-      recognition.start();
-
-      recognition.onresult = function(event) {
-        document.getElementById("userInput").value =
-          event.results[0][0].transcript;
-      };
-    }
-
-    // Lock screen
-    const password = "SudhieeRocks💜"; // CHANGE to your own
-    function unlock() {
-      const input = document.getElementById("passInput").value;
-      if (input === password) {
-        document.getElementById("lockScreen").style.display = "none";
-      } else {
-        alert("Wrong password!");
-      }
-    }
-
-    // Dark/light mode toggle
-    function toggleMode() {
-      document.body.classList.toggle("light-mode");
-    }
-  </script>
+tsParticles.load("particles-js",{
+  particles:{
+    number:{value:60},
+    color:{value:"#ffffff"},
+    links:{enable:true,color:"#ffffff"},
+    move:{enable:true,speed:2}
+  }
+});
+</script>
 
 </body>
-
 </html>
